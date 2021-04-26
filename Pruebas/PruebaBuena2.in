@@ -1,0 +1,38 @@
+program programa_ejemplo2
+
+    int n1, n2, n3, n_total;
+    
+    [*
+    Lista de cosas (comentario):
+    - Comentario con muchas lineas.
+    - Cosa 1
+    - Cosa 2
+        - Cosa 2.1
+    *]
+
+	proc mult(int <= n1; int <= n2; int <=> n3)
+	{	
+        if n1 > n2 {
+            n3 = n1 * n2;
+            exit;
+        }; # fin del if
+
+        if n2 <= n1 {
+            n3 = (n1 * n1) + n2;
+        }; # fin del if
+
+        while forever {
+			read(var1);
+			println(var1);
+			exit;
+		}; # fin de while forever
+    
+	} # fin de proc mult
+
+{
+    read(n1); read(n2);
+    e = 0.1e-1/a;
+    # mult(n1, n2, n3);
+    n_total = n3 * e;
+    println(n_total);
+} 

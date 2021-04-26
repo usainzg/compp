@@ -1,0 +1,27 @@
+program programa_ejemplo2
+
+    int n1, n2, n3, n_total;
+    
+    [*
+    - prueba mala con "procedure" en vez de "proc"
+    *]
+
+	procedure mult(int <= n1; int <= n2; int <=> n3)
+	{	
+        if n1 > n2 {
+            n3 = n1 * n2;
+            exit;
+        }; # fin del if
+
+        if n2 <= n1 {
+            n3 = (n1 * n1) + n2;
+        }; # fin del if
+	} # fin de proc mult
+
+{
+    read(n1); read(n2);
+    e = 0.1e-1/a;
+    # mult(n1, n2, n3);
+    n_total = n3 * e;
+    println(n_total);
+} 
