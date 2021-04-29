@@ -29,6 +29,7 @@ letra [a-zA-Z]
 program	                TOKEN(RPROGRAM);
 int                     TOKEN(RINTEGER);
 float		            TOKEN(RFLOAT);
+for                     TOKEN(RFOR);
 while		            TOKEN(RWHILE);
 until                   TOKEN(RUNTIL);
 exit		            TOKEN(REXIT);

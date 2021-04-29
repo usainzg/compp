@@ -1,22 +1,22 @@
 %define parse.error verbose
 
 %{
-   #include <stdio.h>
-   #include <iostream>
-   #include <vector>
-   #include <string>
-   using namespace std; 
-   
-   extern int yylex();
-   extern int yylineno;
-   extern char *yytext;
-   void yyerror (const char *msg) {
-        printf("line %d: %s\n", yylineno, msg) ;
-   }
+    #include <stdio.h>
+    #include <iostream>
+    #include <vector>
+    #include <string>
+    using namespace std; 
+    
+    extern int yylex();
+    extern int yylineno;
+    extern char *yytext;
+    void yyerror (const char *msg) {
+            printf("line %d: %s\n", yylineno, msg) ;
+    }
 
-   #include "Codigo.hpp"
-   
-   Codigo codigo;
+    #include "Codigo.hpp"
+    
+    Codigo codigo;
 %}
 
 /* 
@@ -42,7 +42,7 @@
 %token <str> TSEMIC TASSIG TLBRACE TRBRACE TLPAREN TRPAREN TCOMMA
 %token <str> RPROGRAM RPROCEDURE
 %token <str> RFLOAT RINTEGER
-%token <str> RWHILE RUNTIL RIF RELSE RFOREVER RDO RSKIP REXIT
+%token <str> RFOR RWHILE RUNTIL RIF RELSE RFOREVER RDO RSKIP REXIT
 %token <str> RREAD RPRINTLN
 
 
@@ -213,6 +213,23 @@ sentencia : variable TASSIG expr TSEMIC
         $$->exits = codigo.iniLista(0);
         $$->skips = codigo.iniLista(0);
 		delete $3;
+    }
+    | RFOR TLPAREN tipo variable TASSIG expr 
+	{
+        codigo.anadirDeclaraciones(codigo.iniLista($4->nom), $3->clase);
+        codigo.anadirInstruccion($4->nom + " := " + $6->nom + ";"); // 7
+	}
+    TSEMIC M expr M TSEMIC variable TASSIG expr TRPAREN TLBRACE lista_de_sentencias M TRBRACE TSEMIC
+    {
+        codigo.anadirInstruccion($13->nom + " := " + $15->nom + ";");
+        codigo.anadirInstruccion("goto " + to_string($9->ref) + ";");
+        codigo.completarInstrucciones($10->trues, $11->ref);
+        codigo.completarInstrucciones($10->falses, $19->ref + 2);
+        codigo.completarInstrucciones($18->exits, $19->ref + 2);
+        $$ = new sentenciastruct; 
+        $$->exits = codigo.iniLista(0);
+        $$->skips = codigo.iniLista(0);
+        delete $3; delete $4; delete $6; delete $9; delete $10; delete $11; delete $13; delete $15; delete $18; delete $19;
     }
     ;
 
