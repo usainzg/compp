@@ -331,44 +331,51 @@ expr :
     }
     | expr TPLUS expr
     {
-        $$ = new expresionstruct;
-        $$->nom = codigo.nuevoId();
-        codigo.anadirInstruccion($$->nom + " := " + $1->nom + " + " + $3->nom + ";");
-        $$->trues = codigo.iniLista(0);
-        $$->falses = codigo.iniLista(0);
+        try {
+            $$ = new expresionstruct;
+            codigo.operacionAritmetica($$, *$1, *$3, "+"); // ultimo parametro tambien puede ser *$2
+            delete $1; delete $3;
+        } catch (String s) {
+            yyerror(s.c_str());
+        }
         delete $1; delete $3;
     }
     | expr TMINUS expr
     {
-        $$ = new expresionstruct;
-        $$->nom = codigo.nuevoId();
-        codigo.anadirInstruccion($$->nom + " := " + $1->nom + " - " + $3->nom + ";");
-        $$->trues = codigo.iniLista(0);
-        $$->falses = codigo.iniLista(0);
-        delete $1; delete $3;
+        try {
+            $$ = new expresionstruct;
+            codigo.operacionAritmetica($$, *$1, *$3, "-"); // ultimo parametro tambien puede ser *$2
+            delete $1; delete $3;
+        } catch (String s) {
+            yyerror(s.c_str());
+        }
     }
     | expr TMUL expr
     {
-        $$ = new expresionstruct;
-        $$->nom = codigo.nuevoId();
-        codigo.anadirInstruccion($$->nom + " := " + $1->nom + " * " + $3->nom + ";");
-        $$->trues = codigo.iniLista(0);
-        $$->falses = codigo.iniLista(0);
-        delete $1; delete $3;
+        try {
+            $$ = new expresionstruct;
+            codigo.operacionAritmetica($$, *$1, *$3, "*"); // ultimo parametro tambien puede ser *$2
+            delete $1; delete $3;
+        } catch (String s) {
+            yyerror(s.c_str());
+        }
     }
     | expr TDIV expr
     {
-        $$ = new expresionstruct;
-        $$->nom = codigo.nuevoId();
-        codigo.anadirInstruccion($$->nom + " := " + $1->nom + " / " + $3->nom + ";");
-        $$->trues = codigo.iniLista(0);
-        $$->falses = codigo.iniLista(0);
-        delete $1; delete $3;
+        try {
+            $$ = new expresionstruct;
+            codigo.anadirInstruccion("if " + $3->nom + " = 0 goto ErrorDiv0;");
+            codigo.operacionAritmetica($$, *$1, *$3, "/"); // ultimo parametro tambien puede ser *$2
+            delete $1; delete $3;
+        } catch (String s) {
+            yyerror(s.c_str());
+        }
     }
     | variable
     {
         $$ = new expresionstruct;
         $$->nom = $1->nom;
+        $$->tipo = $1->tipo;
         $$->trues = codigo.iniLista(0);
         $$->falses = codigo.iniLista(0);
         delete $1;
@@ -377,6 +384,7 @@ expr :
     {
         $$ = new expresionstruct;
         $$->nom = *$1;
+        $$->tipo = Codigo::NUMERO_INT;
         $$->trues = codigo.iniLista(0);
         $$->falses = codigo.iniLista(0);
     }
@@ -384,6 +392,7 @@ expr :
     {
         $$ = new expresionstruct;
         $$->nom = *$1;
+        $$->tipo = Codigo::NUMERO_FLOAT;
         $$->trues = codigo.iniLista(0);
         $$->falses = codigo.iniLista(0);
     }
