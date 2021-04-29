@@ -100,8 +100,8 @@ resto_lista_id : TCOMMA TIDENTIFIER resto_lista_id
     | /* vacio */ { $$ = new resto_lista_idstruct; $$->lnom = codigo.iniLista(""); }
     ;
 
-tipo : RINTEGER { $$ = new tipostruct; $$->clase = "ent"; }
-    | RFLOAT { $$ = new tipostruct; $$->clase = "real"; }
+tipo : RINTEGER { $$ = new tipostruct; $$->clase = Codigo::NUMERO_INT; }
+    | RFLOAT { $$ = new tipostruct; $$->clase = Codigo::NUMERO_FLOAT; }
     ;
 
 decl_de_subprogs : decl_de_subprograma decl_de_subprogs

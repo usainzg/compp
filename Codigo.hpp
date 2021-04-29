@@ -29,6 +29,10 @@ private:
 	/* Instrucciones que forman el código. */
 	std::vector<std::string> instrucciones;
 
+	/* Indica el procedimiento que se está declarando, para que cuando se llame a anadirParametros se añadan a dicho procedimiento. */
+	std::string procedimientoActual;
+
+	/* Pila de tablas de símbolos */
 	PilaTablaSimbolos pilaTS;
 
 
@@ -68,6 +72,25 @@ public:
 
 	/* Elimina el tope de la pila de tablas de símbolos */
 	void desempilar();
+
+	/* Añade el prodecimiento pProc al tope de la pila, crea una una tabla de símbolos y la empila.
+	Finalmente añade la instrucción correspondiente. */
+	void declararProcedimiento(const std::string &pProc);
+
+	/* Añade la instrucción endproc y desempila la tabla de símbolos. */
+	void finProcedimiento();
+
+	void comprobarTipos(const std::string &pTipo1, const std::string &pTipo2);
+
+	/* Devuleve el tipo de la variable id. */
+	std::string obtenerTipo(const std::string &id);
+
+	/* Devuelve True si pQuery es del tipo pTipo. */
+	bool esTipo(const std::string &pTipo, const std::string &pQuery);
+
+	void operacionAritmetica(expresionstruct *dobleDolar, const expresionstruct &op1, const expresionstruct &op2, const std::string &operacion);
+
+	void operacionBooleana(expresionstruct *dobleDolar, const expresionstruct &op1, const expresionstruct &op2, const std::string &operacion);
 
 	/* Devuelve un string vacío */
 	std::string iniNom();

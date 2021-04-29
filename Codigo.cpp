@@ -58,6 +58,7 @@ void Codigo::anadirDeclaraciones(const vector<string> &idNombres, const string &
     vector<string>::const_iterator iter;
     for (iter = idNombres.begin(); iter != idNombres.end(); iter++)
     {
+        pilaTS.tope().anadirVariable(*iter, tipoNombre);
         anadirInstruccion(tipoNombre + " " + *iter + ";");
     }
 }
