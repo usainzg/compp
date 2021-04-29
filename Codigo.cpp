@@ -14,6 +14,8 @@ const string Codigo::BOOLEANO = "bool";
 Codigo::Codigo()
 {
     siguienteIdentificador = 1;
+    TablaSimbolos ts;
+    this->empilar(ts);
 }
 
 /************************/
@@ -112,6 +114,14 @@ void Codigo::escribir() const
 int Codigo::obtenRef() const
 {
     return siguienteInstruccion();
+}
+
+void Codigo::empilar(const TablaSimbolos &ts) {
+    pilaTS.empilar(ts);
+}
+
+void Codigo::desempilar(){
+    pilaTS.desempilar();
 }
 
 string Codigo::iniNom() {

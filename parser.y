@@ -43,10 +43,12 @@
 %token <str> RPROGRAM RPROCEDURE
 %token <str> RFLOAT RINTEGER
 %token <str> RFOR RWHILE RUNTIL RIF RELSE RFOREVER RDO RSKIP REXIT
+%token <str> RAND ROR RNOT
 %token <str> RREAD RPRINTLN
 
 
-// %nonassoc TEQUAL TNEQUAL TCLE TCGT TCGE 
+%right RAND ROR
+%left RNOT
 %left TEQUAL TCGT TCLT TCGE TCLE TNEQUAL
 %left TPLUS TMINUS
 %left TMUL TDIV
@@ -298,6 +300,34 @@ expr :
         codigo.anadirInstruccion("if " + $1->nom + " /= " + $3->nom + " goto");
         codigo.anadirInstruccion("goto");
         delete $1; delete $3;
+    }
+    | expr RAND M expr
+    {
+        $$ = new expresionstruct;
+        $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
+        codigo.completarInstrucciones($1->trues, $3->ref);
+        $$->trues = $4->trues;
+        $$->falses = *codigo.unir($1->falses, $4->falses);
+        delete $1; delete $3;
+    }
+    | expr ROR M expr
+    {
+        $$ = new expresionstruct;
+        $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
+        codigo.completarInstrucciones($1->falses, $3->ref);
+        $$->trues = *codigo.unir($1->trues, $4->trues);
+        $$->falses = $4->falses;
+        delete $1; delete $3;
+    }
+    | RNOT expr
+    {
+        $$ = new expresionstruct;
+        $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
+        $$->trues = $2->falses;
+        $$->falses = $2->trues;
     }
     | expr TPLUS expr
     {

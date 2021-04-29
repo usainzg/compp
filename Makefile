@@ -1,5 +1,5 @@
 CFLAGS=-Wall
-FUENTES=parser.cpp main.cpp tokens.cpp Codigo.cpp
+FUENTES=parser.cpp main.cpp tokens.cpp Codigo.cpp PilaTablaSimbolos.cpp TablaSimbolos.cpp
 
 all: parser prueba
 
@@ -19,5 +19,6 @@ prueba:
 	./parser <Pruebas/PruebaBuena1.in
 	./parser <Pruebas/PruebaBuena2.in
 	./parser <Pruebas/PruebaBuena3.in
+	./parser <Pruebas/PruebaBuena4.in
 	./parser <Pruebas/PruebaMala1.in
 	./parser <Pruebas/PruebaMala2.in

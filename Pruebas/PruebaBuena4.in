@@ -1,0 +1,39 @@
+program trianguloPascal 
+    [*
+        Este programa imprime el número de líneas que reciba por teclado del triángulo de pascal.
+        (El programa no funciona para valores mayores que 5, pues aparecen números de dos dígitos
+        y se decuadra el triángulo, además, pueden aparecer ceros y no se sabría si es un espacio
+        o es parte del número).
+        El siguiente es un ejemplo, si se le pasa el número 5 por teclado.
+
+        000001000000
+        000010100000
+        000102010000
+        001030301000
+        010406040100
+
+    *]
+    int rows, coef;
+    {
+    read(rows);
+
+    for(int i = 0; i < rows; i = i + 1) {
+
+        for(int space = 1; space <= rows - i; space = space + 1) {
+            println(0);
+        };
+
+        for(int j = 0; j <= i; j = j + 1){
+            if (j == 0 or i == 0) {
+                coef = 1;
+            }; 
+            
+            if (j /= 0 and i /= 0) {
+                coef = coef * ( i - j + 1 ) / j;
+            };
+            println(coef);
+            println(0);
+        };
+        println(0);
+    };
+} 

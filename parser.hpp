@@ -88,8 +88,11 @@ extern int yydebug;
     RDO = 289,                     /* RDO  */
     RSKIP = 290,                   /* RSKIP  */
     REXIT = 291,                   /* REXIT  */
-    RREAD = 292,                   /* RREAD  */
-    RPRINTLN = 293                 /* RPRINTLN  */
+    RAND = 292,                    /* RAND  */
+    ROR = 293,                     /* ROR  */
+    RNOT = 294,                    /* RNOT  */
+    RREAD = 295,                   /* RREAD  */
+    RPRINTLN = 296                 /* RPRINTLN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -111,7 +114,7 @@ union YYSTYPE
     variablestruct *var;
     expresionstruct *expr; 
 
-#line 115 "parser.hpp"
+#line 118 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

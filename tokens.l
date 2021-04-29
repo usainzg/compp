@@ -29,6 +29,9 @@ letra [a-zA-Z]
 program	                TOKEN(RPROGRAM);
 int                     TOKEN(RINTEGER);
 float		            TOKEN(RFLOAT);
+and                     TOKEN(RAND);
+or                      TOKEN(ROR);
+not                     TOKEN(RNOT);
 for                     TOKEN(RFOR);
 while		            TOKEN(RWHILE);
 until                   TOKEN(RUNTIL);

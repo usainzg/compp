@@ -6,6 +6,8 @@
 #include <set>
 #include <vector>
 #include "Structs.hpp"
+#include "TablaSimbolos.hpp"
+#include "PilaTablaSimbolos.hpp"
 
 /* Estructura de datos para el código generado. El código, en vez de escribirlo directamente, 
  * se guarda en esta estructura y, al final, se escribirán en un fichero.
@@ -26,6 +28,9 @@ private:
 
 	/* Instrucciones que forman el código. */
 	std::vector<std::string> instrucciones;
+
+	PilaTablaSimbolos pilaTS;
+
 
 public:
 
@@ -57,6 +62,12 @@ public:
 
 	/* Devuelve el número de la siguiente instrucción. */
 	int obtenRef() const;
+
+	/* Añade ts al tope de la pila de tablas de símbolos */
+	void empilar(const TablaSimbolos &ts);
+
+	/* Elimina el tope de la pila de tablas de símbolos */
+	void desempilar();
 
 	/* Devuelve un string vacío */
 	std::string iniNom();
