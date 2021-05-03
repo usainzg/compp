@@ -72,7 +72,7 @@
 programa : RPROGRAM TIDENTIFIER 
     { codigo.anadirInstruccion(*$1 + " " + *$2 + ";"); } 
     declaraciones decl_de_subprogs TLBRACE lista_de_sentencias TRBRACE 
-    { codigo.anadirInstruccion("halt;"); codigo.escribir(); }
+    { codigo.anadirInstruccion("halt;"); codigo.escribir(); codigo.desempilar(); }
     ;
 
 declaraciones : tipo lista_de_ident 
@@ -108,8 +108,8 @@ decl_de_subprogs : decl_de_subprograma decl_de_subprogs
     | /* vacio */
     ;
 
-decl_de_subprograma : RPROCEDURE TIDENTIFIER  { codigo.anadirInstruccion(*$1 + " " + *$2 + ";"); } argumentos declaraciones
-    decl_de_subprogs TLBRACE lista_de_sentencias TRBRACE { codigo.anadirInstruccion("endproc;"); }
+decl_de_subprograma : RPROCEDURE TIDENTIFIER  { codigo.declararProcedimiento(*$2); } argumentos declaraciones
+    decl_de_subprogs TLBRACE lista_de_sentencias TRBRACE { codigo.finProcedimiento(); }
     ;
 
 argumentos : TLPAREN lista_de_param TRPAREN
@@ -148,20 +148,44 @@ lista_de_sentencias : sentencia lista_de_sentencias
 
 sentencia : variable TASSIG expr TSEMIC
     {
-        codigo.anadirInstruccion($1->nom + " := " + $3->nom + ";");
-		$$ = new sentenciastruct;
-		$$->exits = codigo.iniLista(0);
-        $$->skips = codigo.iniLista(0);
-		delete $1; delete $3;
+        try {
+            string tmp;
+            string tipoVar = codigo.obtenerTipo($1->tipo);
+
+            if (codigo.esTipo(tipoVar, Codigo::NUMERO_INT) && codigo.esTipo($3->tipo, Codigo::NUMERO_FLOAT)){
+				tmp = codigo.nuevoId();
+				codigo.anadirInstruccion(tmp + " := real2ent " + $3->nom + ";");
+			} else if (codigo.esTipo(tipoVar, Codigo::NUMERO_FLOAT) && codigo.esTipo($3->tipo, Codigo::NUMERO_INT)) {
+				tmp = codigo.nuevoId();
+				codigo.anadirInstruccion(tmp + " := ent2real " + $3->nom + ";");
+			} else if (!codigo.esTipo(tipoVar, $3->tipo)){
+				yyerror(string("Error semántico. No se puede asignar a una variable de tipo " + $3->tipo + " a otra de tipo " + tipoVar + ".").c_str());
+			} else {
+				tmp = $3->nom;
+			}
+
+			codigo.anadirInstruccion($1->nom + " := " + tmp + ";");
+			$$ = new sentenciastruct;
+		    $$->exits = codigo.iniLista(0);
+            $$->skips = codigo.iniLista(0);
+			delete $1; delete $3;
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
     }
     | RIF expr TLBRACE M lista_de_sentencias TRBRACE M TSEMIC 
-    {
-        codigo.completarInstrucciones($2->trues, $4->ref);
-		codigo.completarInstrucciones($2->falses, $7->ref);
-		$$ = new sentenciastruct; 
-        $$->exits = $5->exits;
-        $$->skips = $5->skips;
-		delete $2; delete $4; delete $5; delete $7;
+    {	
+        try {
+			codigo.comprobarTipos($2->tipo, Codigo::BOOLEANO);
+			codigo.completarInstrucciones($2->trues, $4->ref);
+			codigo.completarInstrucciones($2->falses, $7->ref);
+			$$ = new sentenciastruct; 
+            $$->exits = $5->exits;
+            $$->skips = $5->skips;
+            delete $2; delete $4; delete $5; delete $7;
+		} catch (string s) {
+			yyerror("Error semántico. La condición de la estructura IF debe ser de tipo Codigo::BOOLEANO.");
+		}
     }
     | RWHILE RFOREVER TLBRACE M lista_de_sentencias TRBRACE M TSEMIC
     {
