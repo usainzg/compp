@@ -21,5 +21,7 @@ prueba:
 	./parser <Pruebas/PruebaBuena3.in
 	./parser <Pruebas/PruebaBuena4.in
 	./parser <Pruebas/PruebaBuena5.in
+	./parser <Pruebas/PruebaBuena6.in
 	./parser <Pruebas/PruebaMala1.in
 	./parser <Pruebas/PruebaMala2.in
+	./parser <Pruebas/PruebaMala3.in

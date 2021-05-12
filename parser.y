@@ -440,7 +440,7 @@ expr :
     {
         $$ = new expresionstruct;
         try {
-            codigo.operacionAritmetica($$, *$1, *$3, "+"); // ultimo parametro tambien puede ser *$2
+            codigo.operacionAritmetica($$, *$1, *$3, *$2); // ultimo parametro tambien puede ser *$2
         } catch (string s) {
             yyerror(s.c_str());
             $$->nom = codigo.iniNom();

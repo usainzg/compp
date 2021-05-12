@@ -2060,7 +2060,7 @@ yyreduce:
     {
         (yyval.expr) = new expresionstruct;
         try {
-            codigo.operacionAritmetica((yyval.expr), *(yyvsp[-2].expr), *(yyvsp[0].expr), "+"); // ultimo parametro tambien puede ser *$2
+            codigo.operacionAritmetica((yyval.expr), *(yyvsp[-2].expr), *(yyvsp[0].expr), *(yyvsp[-1].str)); // ultimo parametro tambien puede ser *$2
         } catch (string s) {
             yyerror(s.c_str());
             (yyval.expr)->nom = codigo.iniNom();
