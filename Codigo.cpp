@@ -134,12 +134,12 @@ void Codigo::declararProcedimiento(const string &pProc) {
     this->anadirInstruccion("proc " + pProc + ";");
 }
 
-void Codigo::finProcedimiento(){
+void Codigo::finProcedimiento() {
     this->procedimientoActual = "";
     this->desempilar();
 }
 
-void Codigo::comprobarTipos(const string &pTipo1, const string &pTipo2){
+void Codigo::comprobarTipos(const string &pTipo1, const string &pTipo2) {
     if (pTipo2.find(pTipo1) == string::npos){
         throw string("Error semántico. Los tipos " + pTipo1 + " y " + pTipo2 + " no concuerdan.");
     }
@@ -147,6 +147,20 @@ void Codigo::comprobarTipos(const string &pTipo1, const string &pTipo2){
 
 bool Codigo::esTipo(const string &pTipo, const string &pQuery){
     return pTipo.find(pQuery) != string::npos;
+}
+
+void Codigo::llamadaProcedimiento (const string &proc, const vector<string> &lnom) {
+    try {
+        this->pilaTS.verificarNumArgs(proc, lnom.size());
+        for (int i = 0; i < lnom.size(); i++) {
+            pair<string, string> param = this->pilaTS.obtenerTiposParametro(proc, i);
+            this->comprobarTipos(param.second, this->pilaTS.obtenerTipo(lnom[i]));
+            this->anadirInstruccion("param_" + param.first + " " + lnom[i] + ";");
+        }
+        this->anadirInstruccion("call " + proc + ";");
+    } catch (string s) {
+        throw s;
+    }
 }
 
 string Codigo::iniNom() {

@@ -92,6 +92,8 @@ public:
 
 	void operacionBooleana(expresionstruct *dobleDolar, const expresionstruct &op1, const expresionstruct &op2, const std::string &operacion);
 
+	void llamadaProcedimiento(const std::string &proc, const std::vector<std::string> &lnom);
+	
 	/* Devuelve un string vacío */
 	std::string iniNom();
 

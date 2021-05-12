@@ -257,6 +257,18 @@ sentencia : variable TASSIG expr TSEMIC
         $$->skips = codigo.iniLista(0);
         delete $3; delete $4; delete $6; delete $9; delete $10; delete $11; delete $13; delete $15; delete $18; delete $19;
     }
+    | TIDENTIFIER TLPAREN lista_de_ident TRPAREN TSEMIC // procedimientos
+    {
+        try {
+            codigo.llamadaProcedimiento(*$1, $3->lnom);
+            $$ = new sentenciastruct; 
+            $$->exits = codigo.iniLista(0);
+            $$->skips = codigo.iniLista(0);
+            delete $3;
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
+    }
     ;
 
 M: { $$ = new mstruct; $$->ref = codigo.obtenRef(); };
