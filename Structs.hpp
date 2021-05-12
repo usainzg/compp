@@ -43,4 +43,9 @@ struct expresionstruct {
   std::vector<int> trues ;
   std::vector<int> falses ;
 };
+
+struct argumentostruct {
+	std::vector<std::pair<std::string, std::string>> lparam;
+};
+
 #endif /* STRUCTS_HPP_ */

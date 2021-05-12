@@ -6,7 +6,7 @@ program ejemplo_con_nombre_muy_largo
  comentario multilinea *]
 
 	proc suma(int <= x; int <= y; int <=> resul)
-		int aux, iteraciones;
+		int aux, iteraciones, result;
 		{	
 		aux = x;
 	   	resul = y;

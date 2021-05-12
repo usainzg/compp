@@ -113,8 +113,9 @@ union YYSTYPE
     mstruct *m;
     variablestruct *var;
     expresionstruct *expr; 
+    argumentostruct *arg;
 
-#line 118 "parser.hpp"
+#line 119 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

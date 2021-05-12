@@ -92,7 +92,7 @@ public:
 
 	void operacionBooleana(expresionstruct *dobleDolar, const expresionstruct &op1, const expresionstruct &op2, const std::string &operacion);
 
-	void llamadaProcedimiento(const std::string &proc, const std::vector<std::string> &lnom);
+	void llamadaProcedimiento (const std::string &proc, const std::vector<std::pair<std::string, std::string>> &lparam);
 	
 	/* Devuelve un string vacío */
 	std::string iniNom();
@@ -103,6 +103,9 @@ public:
 	/* Devuelve una lista de string vacía en caso de que &arg sea un string vacío, en otro caso devuelve la lista con &arg. */
 	std::vector<std::string> iniLista(const std::string &arg);
 
+	/* Devuelve una lista de pares de strings vacía en caso de que &id sea un string vacío, en otro caso devuelve la lista con el par <id, tipo>. */
+	std::vector<std::pair<std::string, std::string>> iniLista(const std::string &id, const std::string &tipo);
+
 	/* Devuelve true si &lista es una lista de enteros vacía. */
 	bool esVacia(const std::vector<int> &lista);
 
@@ -111,6 +114,9 @@ public:
 
 	/* Devuelve el puntero a la lista resultante de unir las listas &list1 y &list2. */
 	std::vector<std::string> *unir(const std::vector<std::string> &list1, const std::vector<std::string> &list2);
+
+	/* Devuelve el puntero a la lista resultante de unir las listas &list1 y &list2. */
+	std::vector<std::pair<std::string, std::string>> *unir(const std::vector<std::pair<std::string, std::string>> &list1, const std::vector<std::pair<std::string, std::string>> &list2);
 
 	/* Constante que indica el tipo numérico, tanto ent como real. */
 	static const std::string NUMERO;

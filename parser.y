@@ -33,6 +33,7 @@
     mstruct *m;
     variablestruct *var;
     expresionstruct *expr; 
+    argumentostruct *arg;
 }
 
 /* declaración de tokens. Esto debe coincidir con tokens.l */
@@ -63,6 +64,8 @@
 %type <var> variable
 %type <expr> expr
 %type <m> M
+%type <arg> lista_de_argumentos
+%type <arg> resto_lista_argumentos
 
 
 %start programa
@@ -78,7 +81,7 @@ programa : RPROGRAM TIDENTIFIER
 declaraciones : tipo lista_de_ident 
     { codigo.anadirDeclaraciones($2->lnom, $1->clase); delete $1; delete $2; } 
     TSEMIC declaraciones
-    | /* vacio */
+    | %empty /* vacio */
     ;
 
 lista_de_ident : TIDENTIFIER resto_lista_id
@@ -97,7 +100,7 @@ resto_lista_id : TCOMMA TIDENTIFIER resto_lista_id
         $$->lnom = *codigo.unir($$->lnom, $3->lnom);
         delete $3;
     }
-    | /* vacio */ { $$ = new resto_lista_idstruct; $$->lnom = codigo.iniLista(""); }
+    | %empty /* vacio */ { $$ = new resto_lista_idstruct; $$->lnom = codigo.iniLista(""); }
     ;
 
 tipo : RINTEGER { $$ = new tipostruct; $$->clase = Codigo::NUMERO_INT; }
@@ -105,7 +108,7 @@ tipo : RINTEGER { $$ = new tipostruct; $$->clase = Codigo::NUMERO_INT; }
     ;
 
 decl_de_subprogs : decl_de_subprograma decl_de_subprogs
-    | /* vacio */
+    | %empty /* vacio */
     ;
 
 decl_de_subprograma : RPROCEDURE TIDENTIFIER  { codigo.declararProcedimiento(*$2); } argumentos declaraciones
@@ -113,7 +116,7 @@ decl_de_subprograma : RPROCEDURE TIDENTIFIER  { codigo.declararProcedimiento(*$2
     ;
 
 argumentos : TLPAREN lista_de_param TRPAREN
-    | /* vacio */
+    | %empty /* vacio */
     ;
 
 lista_de_param : tipo clase_par lista_de_ident 
@@ -130,7 +133,7 @@ clase_par :
 resto_lis_de_param : TSEMIC tipo clase_par lista_de_ident 
     { codigo.anadirParametros($4->lnom, $3->tipo, $2->clase); delete $2; delete $3; delete $4; } 
     resto_lis_de_param
-    | /* vacio */
+    | %empty /* vacio */
     ;
 
 lista_de_sentencias : sentencia lista_de_sentencias
@@ -140,7 +143,7 @@ lista_de_sentencias : sentencia lista_de_sentencias
         $$->skips = *codigo.unir($1->skips, $2->skips);
         delete $1; delete $2;
     }
-    | /*vacio*/ 
+    | %empty /*vacio*/ 
     { 
         $$ = new lista_de_sentenciasstruct; $$->exits = codigo.iniLista(0); $$->skips = codigo.iniLista(0); 
     }
@@ -165,13 +168,11 @@ sentencia : variable TASSIG expr TSEMIC
 			}
 
 			codigo.anadirInstruccion($1->nom + " := " + tmp + ";");
-			$$ = new sentenciastruct;
-		    $$->exits = codigo.iniLista(0);
-            $$->skips = codigo.iniLista(0);
-			delete $1; delete $3;
-        } catch (string s) {
-            yyerror(s.c_str());
-        }
+        } catch (string s) {}
+        $$ = new sentenciastruct;
+        $$->exits = codigo.iniLista(0);
+        $$->skips = codigo.iniLista(0);
+        delete $1; delete $3;
     }
     | RIF expr TLBRACE M lista_de_sentencias TRBRACE M TSEMIC 
     {	
@@ -257,21 +258,40 @@ sentencia : variable TASSIG expr TSEMIC
         $$->skips = codigo.iniLista(0);
         delete $3; delete $4; delete $6; delete $9; delete $10; delete $11; delete $13; delete $15; delete $18; delete $19;
     }
-    | TIDENTIFIER TLPAREN lista_de_ident TRPAREN TSEMIC // procedimientos
+    | TIDENTIFIER TLPAREN lista_de_argumentos TRPAREN TSEMIC // procedimientos
     {
         try {
-            codigo.llamadaProcedimiento(*$1, $3->lnom);
-            $$ = new sentenciastruct; 
-            $$->exits = codigo.iniLista(0);
-            $$->skips = codigo.iniLista(0);
-            delete $3;
+            codigo.llamadaProcedimiento(*$1, $3->lparam);
         } catch (string s) {
             yyerror(s.c_str());
         }
+        $$ = new sentenciastruct; 
+        $$->exits = codigo.iniLista(0);
+        $$->skips = codigo.iniLista(0);
+        delete $3;
     }
     ;
 
-M: { $$ = new mstruct; $$->ref = codigo.obtenRef(); };
+lista_de_argumentos : expr resto_lista_argumentos
+    {
+        $$ = new argumentostruct;
+        $$->lparam = codigo.iniLista($1->nom, $1->tipo);
+        $$->lparam = *codigo.unir($$->lparam, $2->lparam);
+        delete $1; delete $2;
+    } 
+    ;
+
+resto_lista_argumentos : TCOMMA expr resto_lista_argumentos
+    {
+        $$ = new argumentostruct;
+        $$->lparam = codigo.iniLista($2->nom, $2->tipo);
+        $$->lparam = *codigo.unir($$->lparam, $3->lparam);
+        delete $2; delete $3;
+    }
+    | %empty {$$ = new argumentostruct; $$->lparam = codigo.iniLista("", "");}
+    ;
+
+M: %empty { $$ = new mstruct; $$->ref = codigo.obtenRef(); };
 
 variable : TIDENTIFIER { $$ = new variablestruct; $$->nom = *$1; }
     ;
@@ -279,6 +299,11 @@ variable : TIDENTIFIER { $$ = new variablestruct; $$->nom = *$1; }
 expr : 
     expr TEQUAL expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, $3->tipo);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -289,6 +314,12 @@ expr :
     }
     | expr TCGT expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -299,6 +330,12 @@ expr :
     }
     | expr TCLT expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -309,6 +346,12 @@ expr :
     }
     | expr TCGE expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -319,6 +362,12 @@ expr :
     }
     | expr TCLE expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -329,6 +378,11 @@ expr :
     }
     | expr TNEQUAL expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, $3->tipo);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -339,6 +393,12 @@ expr :
     }
     | expr RAND M expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, Codigo::BOOLEANO);
+			codigo.comprobarTipos($4->tipo, Codigo::BOOLEANO);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->tipo = Codigo::BOOLEANO;
@@ -349,6 +409,12 @@ expr :
     }
     | expr ROR M expr
     {
+        try {
+			codigo.comprobarTipos($1->tipo, Codigo::BOOLEANO);
+			codigo.comprobarTipos($4->tipo, Codigo::BOOLEANO);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->tipo = Codigo::BOOLEANO;
@@ -359,6 +425,11 @@ expr :
     }
     | RNOT expr
     {
+        try {
+			codigo.comprobarTipos($2->tipo, Codigo::BOOLEANO);
+		} catch (string s) {
+			yyerror(s.c_str());
+		}
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->tipo = Codigo::BOOLEANO;
@@ -367,45 +438,60 @@ expr :
     }
     | expr TPLUS expr
     {
+        $$ = new expresionstruct;
         try {
-            $$ = new expresionstruct;
             codigo.operacionAritmetica($$, *$1, *$3, "+"); // ultimo parametro tambien puede ser *$2
-            delete $1; delete $3;
-        } catch (String s) {
+        } catch (string s) {
             yyerror(s.c_str());
+            $$->nom = codigo.iniNom();
+			$$->tipo = $1->tipo;
+			$$->trues = codigo.iniLista(0);
+			$$->falses = codigo.iniLista(0);
         }
         delete $1; delete $3;
     }
     | expr TMINUS expr
     {
+        $$ = new expresionstruct;
         try {
-            $$ = new expresionstruct;
             codigo.operacionAritmetica($$, *$1, *$3, "-"); // ultimo parametro tambien puede ser *$2
-            delete $1; delete $3;
-        } catch (String s) {
+        } catch (string s) {
             yyerror(s.c_str());
+            $$->nom = codigo.iniNom();
+			$$->tipo = $1->tipo;
+			$$->trues = codigo.iniLista(0);
+			$$->falses = codigo.iniLista(0);
         }
+        delete $1; delete $3;
     }
     | expr TMUL expr
     {
+        $$ = new expresionstruct;
         try {
-            $$ = new expresionstruct;
             codigo.operacionAritmetica($$, *$1, *$3, "*"); // ultimo parametro tambien puede ser *$2
-            delete $1; delete $3;
-        } catch (String s) {
+        } catch (string s) {
             yyerror(s.c_str());
+            $$->nom = codigo.iniNom();
+			$$->tipo = $1->tipo;
+			$$->trues = codigo.iniLista(0);
+			$$->falses = codigo.iniLista(0);
         }
+        delete $1; delete $3;
     }
     | expr TDIV expr
     {
-        try {
-            $$ = new expresionstruct;
-            codigo.anadirInstruccion("if " + $3->nom + " = 0 goto ErrorDiv0;");
+        $$ = new expresionstruct;
+        codigo.anadirInstruccion("if " + $3->nom + " = 0 goto ErrorDiv0;");
+        try {    
             codigo.operacionAritmetica($$, *$1, *$3, "/"); // ultimo parametro tambien puede ser *$2
-            delete $1; delete $3;
-        } catch (String s) {
+        } catch (string s) {
             yyerror(s.c_str());
+            $$->nom = codigo.iniNom();
+			$$->tipo = $1->tipo;
+			$$->trues = codigo.iniLista(0);
+			$$->falses = codigo.iniLista(0);
         }
+        delete $1; delete $3;
     }
     | variable
     {

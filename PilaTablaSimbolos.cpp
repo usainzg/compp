@@ -117,8 +117,29 @@ void PilaTablaSimbolos::anadirParametro(string proc, string idVar, string claseP
 /********************/
 
 void PilaTablaSimbolos::verificarNumArgs(string proc, int numArgs) {
-	int numArgsAutentico = pila.top().st.numArgsProcedimiento(proc);
-	if (numArgsAutentico != numArgs) {
-		throw string("Error semántico. Número de argumentos incorrecto en la llamada al procedimiento " + proc);
+	if (pila.empty()) {
+		throw string("Error semántico. Has intentado llamar al procedimiento " + proc + " antes de declararlo.");
+	}
+
+	Elemento *elemento = &pila.top();
+	int numArgsAutentico = 0;
+	bool correcto = false;
+
+	while (elemento != 0) {
+		try {
+			numArgsAutentico = elemento->st.numArgsProcedimiento(proc);
+			if (numArgsAutentico != numArgs) {
+				throw string("Error semántico. Número de argumentos incorrecto en la llamada al procedimiento " + proc);
+			} else {
+				correcto = true;
+				break;
+			}
+		}
+		catch (string errore) {
+			elemento = elemento->ambitoSuperior;
+		}
+	}
+	if (!correcto) {
+		throw string("Error semántico. No se ha encontrado procedimiento " +  proc + ". Puede que el nombre o el número de parámetros sean incorrectos.");
 	}
 }
