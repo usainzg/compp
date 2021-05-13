@@ -10,8 +10,11 @@
     extern int yylex();
     extern int yylineno;
     extern char *yytext;
+    
+    extern bool hayError;
     void yyerror (const char *msg) {
-            printf("line %d: %s\n", yylineno, msg) ;
+        hayError = true;
+        printf("line %d: %s\n", yylineno, msg) ;
     }
 
     #include "Codigo.hpp"
@@ -20,7 +23,7 @@
 %}
 
 /* 
-   qué atributos tienen los tokens 
+qué atributos tienen los tokens 
 */
 %union {
     std::string *str;
@@ -75,7 +78,11 @@
 programa : RPROGRAM TIDENTIFIER 
     { codigo.anadirInstruccion(*$1 + " " + *$2 + ";"); } 
     declaraciones decl_de_subprogs TLBRACE lista_de_sentencias TRBRACE 
-    { codigo.anadirInstruccion("halt;"); codigo.escribir(); codigo.desempilar(); }
+    { 
+        codigo.anadirInstruccion("halt;"); 
+        if (!hayError) codigo.escribir(); 
+        codigo.desempilar(); 
+    }
     ;
 
 declaraciones : tipo lista_de_ident 
@@ -145,7 +152,9 @@ lista_de_sentencias : sentencia lista_de_sentencias
     }
     | %empty /*vacio*/ 
     { 
-        $$ = new lista_de_sentenciasstruct; $$->exits = codigo.iniLista(0); $$->skips = codigo.iniLista(0); 
+        $$ = new lista_de_sentenciasstruct; 
+        $$->exits = codigo.iniLista(0); 
+        $$->skips = codigo.iniLista(0); 
     }
     ;
 
@@ -153,110 +162,141 @@ sentencia : variable TASSIG expr TSEMIC
     {
         try {
             string tmp;
-            string tipoVar = codigo.obtenerTipo($1->tipo);
+            string tipoVar = codigo.obtenerTipo($1->nom);
 
             if (codigo.esTipo(tipoVar, Codigo::NUMERO_INT) && codigo.esTipo($3->tipo, Codigo::NUMERO_FLOAT)){
-				tmp = codigo.nuevoId();
-				codigo.anadirInstruccion(tmp + " := real2ent " + $3->nom + ";");
-			} else if (codigo.esTipo(tipoVar, Codigo::NUMERO_FLOAT) && codigo.esTipo($3->tipo, Codigo::NUMERO_INT)) {
-				tmp = codigo.nuevoId();
-				codigo.anadirInstruccion(tmp + " := ent2real " + $3->nom + ";");
-			} else if (!codigo.esTipo(tipoVar, $3->tipo)){
-				yyerror(string("Error semántico. No se puede asignar a una variable de tipo " + $3->tipo + " a otra de tipo " + tipoVar + ".").c_str());
-			} else {
-				tmp = $3->nom;
-			}
+                tmp = codigo.nuevoId();
+                codigo.anadirInstruccion(tmp + " := real2ent " + $3->nom + ";");
+            } else if (codigo.esTipo(tipoVar, Codigo::NUMERO_FLOAT) && codigo.esTipo($3->tipo, Codigo::NUMERO_INT)) {
+                tmp = codigo.nuevoId();
+                codigo.anadirInstruccion(tmp + " := ent2real " + $3->nom + ";");
+            } else if (! codigo.esTipo(tipoVar, $3->tipo)){
+                yyerror(string("Error semántico. No se puede asignara una variable de tipo " + $3->tipo + " a otra de tipo " + tipoVar + ".").c_str());
+            } else {
+                tmp = $3->nom;
+            }
 
-			codigo.anadirInstruccion($1->nom + " := " + tmp + ";");
+            codigo.anadirInstruccion($1->nom + " := " + tmp + ";");
         } catch (string s) {}
         $$ = new sentenciastruct;
         $$->exits = codigo.iniLista(0);
-        $$->skips = codigo.iniLista(0);
         delete $1; delete $3;
     }
     | RIF expr TLBRACE M lista_de_sentencias TRBRACE M TSEMIC 
     {	
         try {
-			codigo.comprobarTipos($2->tipo, Codigo::BOOLEANO);
-			codigo.completarInstrucciones($2->trues, $4->ref);
-			codigo.completarInstrucciones($2->falses, $7->ref);
-			$$ = new sentenciastruct; 
+            codigo.comprobarTipos($2->tipo, Codigo::BOOLEANO);
+            codigo.completarInstrucciones($2->trues, $4->ref);
+            codigo.completarInstrucciones($2->falses, $7->ref);
+            $$ = new sentenciastruct; 
             $$->exits = $5->exits;
             $$->skips = $5->skips;
             delete $2; delete $4; delete $5; delete $7;
-		} catch (string s) {
-			yyerror("Error semántico. La condición de la estructura IF debe ser de tipo Codigo::BOOLEANO.");
-		}
+        } catch (string s) {
+            yyerror("Error semántico. La condición de la estructura IF debe ser de tipo Codigo::BOOLEANO.");
+        }
     }
     | RWHILE RFOREVER TLBRACE M lista_de_sentencias TRBRACE M TSEMIC
     {
         codigo.anadirInstruccion("goto" + to_string($4->ref) + ";");
-		codigo.completarInstrucciones($5->exits, $7->ref + 1);
-		$$ = new sentenciastruct;
-		$$->exits = codigo.iniLista(0);
+        codigo.completarInstrucciones($5->exits, $7->ref + 1);
+        $$ = new sentenciastruct;
+        $$->exits = codigo.iniLista(0);
         $$->skips = codigo.iniLista(0);
-		delete $4; delete $5; delete $7;
+        delete $4; delete $5; delete $7;
     }
     | RDO TLBRACE M lista_de_sentencias TRBRACE RUNTIL M expr RELSE TLBRACE M lista_de_sentencias TRBRACE M TSEMIC
     {
         codigo.completarInstrucciones($8->trues, $11->ref);
         codigo.completarInstrucciones($8->falses, $3->ref);
-		codigo.completarInstrucciones($4->skips, $7->ref);
+        codigo.completarInstrucciones($4->skips, $7->ref);
         codigo.completarInstrucciones($4->exits, $14->ref);
         codigo.completarInstrucciones($12->exits, $14->ref);
-		$$ = new sentenciastruct;
-		$$->exits = codigo.iniLista(0);
+        $$ = new sentenciastruct;
+        $$->exits = codigo.iniLista(0);
         $$->skips = codigo.iniLista(0);
-		delete $3; delete $4; delete $7; delete $8; delete $11; delete $12; delete $14;
+        delete $3; delete $4; delete $7; delete $8; delete $11; delete $12; delete $14;
     }
     | RSKIP RIF expr M TSEMIC
     {
         codigo.completarInstrucciones($3->falses, $4->ref);
         $$ = new sentenciastruct;
-		$$->exits = codigo.iniLista(0);
+        $$->exits = codigo.iniLista(0);
         $$->skips = $3->trues;
         delete $3; delete $4;
     }
     | REXIT M TSEMIC
     {
         $$ = new sentenciastruct;
-		$$->exits = codigo.iniLista(codigo.obtenRef());
+        $$->exits = codigo.iniLista(codigo.obtenRef());
         $$->skips = codigo.iniLista(0);
         codigo.anadirInstruccion("goto");
     }
     | RREAD TLPAREN variable TRPAREN TSEMIC
     {
         codigo.anadirInstruccion("read " + $3->nom + ";");
-		$$ = new sentenciastruct; 
+        $$ = new sentenciastruct; 
         $$->exits = codigo.iniLista(0);
         $$->skips = codigo.iniLista(0);
-		delete $3;
+        delete $3;
     }
     | RPRINTLN TLPAREN expr TRPAREN TSEMIC
     {
         codigo.anadirInstruccion("write " + $3->nom + ";");
-		codigo.anadirInstruccion("writeln;");
-		$$ = new sentenciastruct; 
-        $$->exits = codigo.iniLista(0);
-        $$->skips = codigo.iniLista(0);
-		delete $3;
-    }
-    | RFOR TLPAREN tipo variable TASSIG expr 
-	{
-        codigo.anadirDeclaraciones(codigo.iniLista($4->nom), $3->clase);
-        codigo.anadirInstruccion($4->nom + " := " + $6->nom + ";"); // 7
-	}
-    TSEMIC M expr M TSEMIC variable TASSIG expr TRPAREN TLBRACE lista_de_sentencias M TRBRACE TSEMIC
-    {
-        codigo.anadirInstruccion($13->nom + " := " + $15->nom + ";");
-        codigo.anadirInstruccion("goto " + to_string($9->ref) + ";");
-        codigo.completarInstrucciones($10->trues, $11->ref);
-        codigo.completarInstrucciones($10->falses, $19->ref + 2);
-        codigo.completarInstrucciones($18->exits, $19->ref + 2);
+        codigo.anadirInstruccion("writeln;");
         $$ = new sentenciastruct; 
         $$->exits = codigo.iniLista(0);
         $$->skips = codigo.iniLista(0);
-        delete $3; delete $4; delete $6; delete $9; delete $10; delete $11; delete $13; delete $15; delete $18; delete $19;
+        delete $3;
+    }
+    | RFOR TLPAREN tipo TIDENTIFIER TASSIG expr 
+    {
+        string variableAsignar;
+        try {
+            codigo.comprobarTipos($6->tipo, $3->clase);
+            variableAsignar = $6->nom;
+        } catch (string s) {
+            if (codigo.esTipo($3->clase, Codigo::NUMERO_INT)) {
+                variableAsignar = codigo.nuevoId();
+                codigo.anadirInstruccion(variableAsignar + " := real2ent " + $6->nom + ";");
+            } else if (codigo.esTipo($3->clase, Codigo::NUMERO_FLOAT)) {
+                variableAsignar = codigo.nuevoId();
+                codigo.anadirInstruccion(variableAsignar + " := ent2real " + $6->nom + ";");
+            } else {
+                yyerror(s.c_str());
+            }
+        }
+        TablaSimbolos ts;
+        codigo.empilar(ts);
+        codigo.anadirDeclaraciones(codigo.iniLista(*$4), $3->clase);
+        codigo.anadirInstruccion(*$4 + " := " + variableAsignar + ";");
+    }
+    TSEMIC M expr 
+    {
+        try {
+            codigo.comprobarTipos($10->tipo, Codigo::BOOLEANO);
+        } catch (string s) {
+            yyerror("Error semántico. La condición de parada debe ser de tipo booleano! ");
+        }
+    }
+    M TSEMIC variable TASSIG expr TRPAREN TLBRACE lista_de_sentencias M TRBRACE TSEMIC
+    {
+        if (*$4 != $14->nom) {
+			yyerror(string("Error semántico. Se debe actualizar la variable " + string(*$4) + " no la variable " + $14->nom + ".").c_str());
+		}
+		try{
+			codigo.comprobarTipos($14->tipo, $16->tipo);
+			codigo.anadirInstruccion($14->nom + " := " + $16->nom + ";");
+			codigo.anadirInstruccion("goto " + to_string($9->ref) + ";");
+			codigo.completarInstrucciones($10->trues, $12->ref);
+			codigo.completarInstrucciones($10->falses, $20->ref + 2);
+			codigo.completarInstrucciones($19->exits, $20->ref + 2);
+		} catch (string s){
+			yyerror(s.c_str());
+		}
+		codigo.desempilar();
+		$$ = new sentenciastruct; $$->exits = codigo.iniLista(0); $$->skips = codigo.iniLista(0);
+		delete $3; delete $6; delete $9; delete $10; delete $12; delete $14; delete $16; delete $19; delete $20;
     }
     | TIDENTIFIER TLPAREN lista_de_argumentos TRPAREN TSEMIC // procedimientos
     {
@@ -293,17 +333,28 @@ resto_lista_argumentos : TCOMMA expr resto_lista_argumentos
 
 M: %empty { $$ = new mstruct; $$->ref = codigo.obtenRef(); };
 
-variable : TIDENTIFIER { $$ = new variablestruct; $$->nom = *$1; }
+variable : TIDENTIFIER 
+    { 
+        string tipo;
+        try {
+            tipo = codigo.obtenerTipo(*$1);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
+        $$ = new variablestruct; 
+        $$->nom = *$1;
+        $$->tipo = tipo;
+    }
     ;
 
 expr : 
     expr TEQUAL expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, $3->tipo);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, $3->tipo);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -315,11 +366,11 @@ expr :
     | expr TCGT expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
-			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+            codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -331,11 +382,11 @@ expr :
     | expr TCLT expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
-			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+            codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -347,11 +398,11 @@ expr :
     | expr TCGE expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
-			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+            codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -363,11 +414,11 @@ expr :
     | expr TCLE expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
-			codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, Codigo::NUMERO);
+            codigo.comprobarTipos($3->tipo, Codigo::NUMERO);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -379,10 +430,10 @@ expr :
     | expr TNEQUAL expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, $3->tipo);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, $3->tipo);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->trues = codigo.iniLista(codigo.obtenRef());
@@ -394,11 +445,11 @@ expr :
     | expr RAND M expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, Codigo::BOOLEANO);
-			codigo.comprobarTipos($4->tipo, Codigo::BOOLEANO);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, Codigo::BOOLEANO);
+            codigo.comprobarTipos($4->tipo, Codigo::BOOLEANO);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->tipo = Codigo::BOOLEANO;
@@ -410,11 +461,11 @@ expr :
     | expr ROR M expr
     {
         try {
-			codigo.comprobarTipos($1->tipo, Codigo::BOOLEANO);
-			codigo.comprobarTipos($4->tipo, Codigo::BOOLEANO);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($1->tipo, Codigo::BOOLEANO);
+            codigo.comprobarTipos($4->tipo, Codigo::BOOLEANO);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->tipo = Codigo::BOOLEANO;
@@ -426,10 +477,10 @@ expr :
     | RNOT expr
     {
         try {
-			codigo.comprobarTipos($2->tipo, Codigo::BOOLEANO);
-		} catch (string s) {
-			yyerror(s.c_str());
-		}
+            codigo.comprobarTipos($2->tipo, Codigo::BOOLEANO);
+        } catch (string s) {
+            yyerror(s.c_str());
+        }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
         $$->tipo = Codigo::BOOLEANO;
@@ -444,9 +495,9 @@ expr :
         } catch (string s) {
             yyerror(s.c_str());
             $$->nom = codigo.iniNom();
-			$$->tipo = $1->tipo;
-			$$->trues = codigo.iniLista(0);
-			$$->falses = codigo.iniLista(0);
+            $$->tipo = $1->tipo;
+            $$->trues = codigo.iniLista(0);
+            $$->falses = codigo.iniLista(0);
         }
         delete $1; delete $3;
     }
@@ -458,9 +509,9 @@ expr :
         } catch (string s) {
             yyerror(s.c_str());
             $$->nom = codigo.iniNom();
-			$$->tipo = $1->tipo;
-			$$->trues = codigo.iniLista(0);
-			$$->falses = codigo.iniLista(0);
+            $$->tipo = $1->tipo;
+            $$->trues = codigo.iniLista(0);
+            $$->falses = codigo.iniLista(0);
         }
         delete $1; delete $3;
     }
@@ -472,9 +523,9 @@ expr :
         } catch (string s) {
             yyerror(s.c_str());
             $$->nom = codigo.iniNom();
-			$$->tipo = $1->tipo;
-			$$->trues = codigo.iniLista(0);
-			$$->falses = codigo.iniLista(0);
+            $$->tipo = $1->tipo;
+            $$->trues = codigo.iniLista(0);
+            $$->falses = codigo.iniLista(0);
         }
         delete $1; delete $3;
     }
@@ -487,9 +538,9 @@ expr :
         } catch (string s) {
             yyerror(s.c_str());
             $$->nom = codigo.iniNom();
-			$$->tipo = $1->tipo;
-			$$->trues = codigo.iniLista(0);
-			$$->falses = codigo.iniLista(0);
+            $$->tipo = $1->tipo;
+            $$->trues = codigo.iniLista(0);
+            $$->falses = codigo.iniLista(0);
         }
         delete $1; delete $3;
     }
