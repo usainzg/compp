@@ -1,14 +1,13 @@
 program sumaPrimerosDiez
     [*
         Este programa calcula la suma de los primeros 10 números enteros, declarando la variable
-        del for fuera. *]
+        del for fuera. 
+    *]
         
     int acumulador;
-    int i;
 {
     acumulador = 0;
-    i = 1;
-    for (i <= 10; i = i + 1) { # Se declara la variable que recorre el bucle fuera -> ERROR
+    for (int i; i <= 10; j = i + 1) { # No actualizamos la variable correcta... ERROR
         acumulador = acumulador + i;
     };
     println(acumulador);

@@ -1,0 +1,17 @@
+program programa_ejemplo2
+
+    float a;
+    int e;
+
+	proc mayor(float <= a; int <=> e)
+	{	
+        if (a > e * 10) {
+            e = a; [* ERROR: no coinciden los tipos *]
+        };
+	} # fin de proc mult
+
+{
+    read(a);
+    read(e);
+    mayor(e, a); [* ERROR: los tipos en la llamada no coinciden *]
+} 

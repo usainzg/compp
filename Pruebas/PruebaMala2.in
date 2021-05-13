@@ -3,7 +3,7 @@ program programa_ejemplo2
     int n1, n2, n3, n_total;
     
     [*
-    - prueba mala con "procedure" en vez de "proc"
+        - prueba mala con "procedure" en vez de "proc"
     *]
 
 	procedure mult(int <= n1; int <= n2; int <=> n3)
