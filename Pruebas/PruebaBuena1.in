@@ -5,9 +5,8 @@ program ejemplo_con_nombre_muy_largo
  [* esto es un **
  comentario multilinea *]
 
-	proc suma(int <= x; int <= y; int <=> resul)
-		int aux, iteraciones, result;
-		{	
+	proc suma(int <= x; int <= y; int <=> resul) int aux, iteraciones;
+	{	
 		aux = x;
 	   	resul = y;
 	   	if resul < 1000  {
@@ -29,8 +28,7 @@ program ejemplo_con_nombre_muy_largo
    read(a); read(b);
    d = 1/b;
    e = 0.1e-1/a;
-   [* suma(a,b,c); esto solo para aquellos que 
-                   traten llamadas a procedimientos *]
+   suma(a,b,c); [* Llamada a PROCEDIMIENTO *]
    c = c*(c*d)+e;
    println(c*c);
 } 

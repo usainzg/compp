@@ -1,38 +1,25 @@
-program ejemplo_con_nombre_muy_largo
+program sumaPrimerosNueve
+    [*
+        Este programa calcula la suma de los primeros 9 números enteros llamando al procedimiento sumaDos.
+    *]
 
- int a, b, c ;
- float d, e ;
- [* esto es un **
- comentario multilinea *]
+    int acumulador, sumaParcial;
 
-	proc suma(int <= x; int <= y; int <=> resul)
-		int aux, iteraciones;
-		{	
-		aux = x;
-	   	resul = y;
-	   	if resul < 1000  {
-			iteraciones = 0;   	
-			do {
-				resul = resul + 1;
-				skip if resul > 1000000;
-				aux = aux - 1;
-				iteraciones = iteraciones + 1;
-			   } until aux == 0
-			else {
-				if resul < 0 { exit; };			
-				println(iteraciones);	
-			};		#fin del do
-	    };  #fin del if
-	} # fin de proc
+    proc sumaDos(int <= x; int <= y; int <=> resul){
+        resul = x + y;
+    }
 
-   {
-   read(a); read(b);
-   d = 1/b;
-   e = 0.1e-1/a;
-   
-   [* Llamada procedimientos *]
-   suma(a,b,c);
-   
-   c = c*(c*d)+e;
-   println(c*c);
+    {
+    acumulador = 0;
+
+    for (int i = 1; i < 10; i = i + 2) {
+        sumaDos(i, i + 1, sumaParcial); [* Llamada a procedimiento *]
+        acumulador = acumulador + sumaParcial;
+    };
+
+    if (not acumulador > 10 and sumaParcial < 10) { [* BOOLEANOS *]
+        print(sumaParcial); [* Uso de PRINT *]
+    };
+
+    # acumulador contiene el resultado final de la suma de los primeros 9 números
 } 
