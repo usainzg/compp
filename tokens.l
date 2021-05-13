@@ -44,6 +44,7 @@ do                      TOKEN(RDO);
 skip                    TOKEN(RSKIP);
 read                    TOKEN(RREAD);
 println                 TOKEN(RPRINTLN);
+print                   TOKEN(RPRINT);
 
 "{"			            TOKEN(TLBRACE);
 "}"                     TOKEN(TRBRACE);

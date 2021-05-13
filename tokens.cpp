@@ -371,8 +371,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 44
-#define YY_END_OF_BUFFER 45
+#define YY_NUM_RULES 45
+#define YY_END_OF_BUFFER 46
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -382,18 +382,18 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[108] =
     {   0,
-        0,    0,   45,   43,    3,    3,   43,   24,   25,   39,
-       37,   26,   38,   36,   42,   28,   30,   27,   32,   40,
-       43,   40,   40,   40,   40,   40,   40,   40,   40,   40,
-       40,   40,   40,   22,   23,    0,    2,   35,    0,   42,
-       31,   34,   33,   40,   40,    0,    0,   40,   18,   40,
-       40,   40,   40,   15,   40,   40,    8,   40,   40,   40,
-       40,   40,   41,   29,    0,    0,    7,   40,   40,   40,
-       10,    5,    9,   40,   40,   40,   40,   40,   40,    0,
-        1,   16,   13,   40,   40,   40,   14,   40,   20,   19,
-       40,   40,    0,   41,    6,   40,   40,   40,   12,   11,
+        0,    0,   46,   44,    3,    3,   44,   25,   26,   40,
+       38,   27,   39,   37,   43,   29,   31,   28,   33,   41,
+       44,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41,   41,   23,   24,    0,    2,   36,    0,   43,
+       32,   35,   34,   41,   41,    0,    0,   41,   18,   41,
+       41,   41,   41,   15,   41,   41,    8,   41,   41,   41,
+       41,   41,   42,   30,    0,    0,    7,   41,   41,   41,
+       10,    5,    9,   41,   41,   41,   41,   41,   41,    0,
+        1,   16,   13,   41,   41,   41,   14,   41,   20,   19,
+       41,   41,    0,   42,    6,   41,   22,   41,   12,   11,
 
-       40,   40,   40,   17,   21,    4,    0
+       41,   41,   41,   17,   21,    4,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -550,11 +550,11 @@ static const flex_int16_t yy_chk[321] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[45] =
+static const flex_int32_t yy_rule_can_match_eol[46] =
     {   0,
 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0,     };
+    0, 0, 0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -980,120 +980,125 @@ TOKEN(RPRINTLN);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 48 "tokens.l"
-TOKEN(TLBRACE);
+#line 47 "tokens.l"
+TOKEN(RPRINT);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 49 "tokens.l"
-TOKEN(TRBRACE);
+TOKEN(TLBRACE);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 50 "tokens.l"
-TOKEN(TLPAREN);
+TOKEN(TRBRACE);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 51 "tokens.l"
-TOKEN(TRPAREN);
+TOKEN(TLPAREN);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 52 "tokens.l"
-TOKEN(TCOMMA);
+TOKEN(TRPAREN);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 53 "tokens.l"
-TOKEN(TASSIG);
+TOKEN(TCOMMA);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 54 "tokens.l"
-TOKEN(TSEMIC);
+TOKEN(TASSIG);
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 55 "tokens.l"
-TOKEN(TCGLE);
+TOKEN(TSEMIC);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 56 "tokens.l"
-TOKEN(TCLT);
+TOKEN(TCGLE);
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 57 "tokens.l"
-TOKEN(TCLE);
+TOKEN(TCLT);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 58 "tokens.l"
-TOKEN(TCGT);
+TOKEN(TCLE);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 59 "tokens.l"
-TOKEN(TCGE);
+TOKEN(TCGT);
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 60 "tokens.l"
-TOKEN(TEQUAL);
+TOKEN(TCGE);
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 61 "tokens.l"
-TOKEN(TNEQUAL);
+TOKEN(TEQUAL);
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 62 "tokens.l"
-TOKEN(TDIV);
+TOKEN(TNEQUAL);
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 63 "tokens.l"
-TOKEN(TPLUS);
+TOKEN(TDIV);
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 64 "tokens.l"
-TOKEN(TMINUS);	
+TOKEN(TPLUS);
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 65 "tokens.l"
-TOKEN(TMUL);
+TOKEN(TMINUS);	
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 68 "tokens.l"
-TOKEN(TIDENTIFIER) ; 
+#line 66 "tokens.l"
+TOKEN(TMUL);
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 69 "tokens.l"
-TOKEN(TDOUBLE);
+TOKEN(TIDENTIFIER) ; 
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 70 "tokens.l"
-TOKEN(TINTEGER); 
+TOKEN(TDOUBLE);
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 72 "tokens.l"
-{ cout << "Token desconocido: " << yytext << endl; yyterminate();}
+#line 71 "tokens.l"
+TOKEN(TINTEGER); 
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 73 "tokens.l"
+{ cout << "Token desconocido: " << yytext << endl; yyterminate();}
+	YY_BREAK
+case 45:
+YY_RULE_SETUP
+#line 74 "tokens.l"
 ECHO;
 	YY_BREAK
-#line 1097 "tokens.cpp"
+#line 1102 "tokens.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2069,5 +2074,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 73 "tokens.l"
+#line 74 "tokens.l"
 

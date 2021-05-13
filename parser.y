@@ -48,7 +48,7 @@ qué atributos tienen los tokens
 %token <str> RFLOAT RINTEGER
 %token <str> RFOR RWHILE RUNTIL RIF RELSE RFOREVER RDO RSKIP REXIT
 %token <str> RAND ROR RNOT
-%token <str> RREAD RPRINTLN
+%token <str> RREAD RPRINTLN RPRINT
 
 
 %right RAND ROR
@@ -240,6 +240,14 @@ sentencia : variable TASSIG expr TSEMIC
         $$->skips = codigo.iniLista(0);
         delete $3;
     }
+    | RPRINT TLPAREN expr TRPAREN TSEMIC
+	{
+		codigo.anadirInstruccion("write " + $3->nom + ";");
+		$$ = new sentenciastruct; 
+        $$->exits = codigo.iniLista(0);
+        $$->skips = codigo.iniLista(0);
+		delete $3;
+	}
     | RPRINTLN TLPAREN expr TRPAREN TSEMIC
     {
         codigo.anadirInstruccion("write " + $3->nom + ";");
