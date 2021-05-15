@@ -1,0 +1,9 @@
+program booleanos
+    int a;
+{
+    println(a < 10);
+
+    a = a > 10;
+
+    e = a - 10;
+} 

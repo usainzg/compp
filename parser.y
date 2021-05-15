@@ -180,6 +180,7 @@ sentencia : variable TASSIG expr TSEMIC
         } catch (string s) {}
         $$ = new sentenciastruct;
         $$->exits = codigo.iniLista(0);
+        $$->skips = codigo.iniLista(0);
         delete $1; delete $3;
     }
     | RIF expr TLBRACE M lista_de_sentencias TRBRACE M TSEMIC 
@@ -205,7 +206,15 @@ sentencia : variable TASSIG expr TSEMIC
         $$->skips = codigo.iniLista(0);
         delete $4; delete $5; delete $7;
     }
-    | RDO TLBRACE M lista_de_sentencias TRBRACE RUNTIL M expr RELSE TLBRACE M lista_de_sentencias TRBRACE M TSEMIC
+    | RDO TLBRACE M lista_de_sentencias TRBRACE RUNTIL M expr 
+    {
+        try {
+            codigo.comprobarTipos($8->tipo, Codigo::BOOLEANO);
+        } catch (string s) {
+            yyerror("Error semantico. Condicion debe ser booleano.");
+        }
+    }
+    RELSE TLBRACE M lista_de_sentencias TRBRACE M TSEMIC
     {
         codigo.completarInstrucciones($8->trues, $11->ref);
         codigo.completarInstrucciones($8->falses, $3->ref);
@@ -219,7 +228,12 @@ sentencia : variable TASSIG expr TSEMIC
     }
     | RSKIP RIF expr M TSEMIC
     {
-        codigo.completarInstrucciones($3->falses, $4->ref);
+        try {
+            codigo.comprobarTipos($3->tipo, Codigo::BOOLEANO);
+            codigo.completarInstrucciones($3->falses, $4->ref);
+        } catch (string s) {
+            yyerror("Error semántico. La condición de la estructura SKIP IF debe ser de tipo booleano.");
+        }
         $$ = new sentenciastruct;
         $$->exits = codigo.iniLista(0);
         $$->skips = $3->trues;
@@ -228,7 +242,7 @@ sentencia : variable TASSIG expr TSEMIC
     | REXIT M TSEMIC
     {
         $$ = new sentenciastruct;
-        $$->exits = codigo.iniLista(codigo.obtenRef());
+        $$->exits = codigo.iniLista($2->ref);
         $$->skips = codigo.iniLista(0);
         codigo.anadirInstruccion("goto");
     }
@@ -240,14 +254,6 @@ sentencia : variable TASSIG expr TSEMIC
         $$->skips = codigo.iniLista(0);
         delete $3;
     }
-    | RPRINT TLPAREN expr TRPAREN TSEMIC
-	{
-		codigo.anadirInstruccion("write " + $3->nom + ";");
-		$$ = new sentenciastruct; 
-        $$->exits = codigo.iniLista(0);
-        $$->skips = codigo.iniLista(0);
-		delete $3;
-	}
     | RPRINTLN TLPAREN expr TRPAREN TSEMIC
     {
         codigo.anadirInstruccion("write " + $3->nom + ";");
@@ -365,6 +371,7 @@ expr :
         }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
         $$->trues = codigo.iniLista(codigo.obtenRef());
         $$->falses = codigo.iniLista(codigo.obtenRef()+1);
         codigo.anadirInstruccion("if " + $1->nom + " = " + $3->nom + " goto");
@@ -381,6 +388,7 @@ expr :
         }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
         $$->trues = codigo.iniLista(codigo.obtenRef());
         $$->falses = codigo.iniLista(codigo.obtenRef()+1);
         codigo.anadirInstruccion("if " + $1->nom + " > " + $3->nom + " goto");
@@ -397,6 +405,7 @@ expr :
         }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
         $$->trues = codigo.iniLista(codigo.obtenRef());
         $$->falses = codigo.iniLista(codigo.obtenRef()+1);
         codigo.anadirInstruccion("if " + $1->nom + " < " + $3->nom + " goto");
@@ -413,6 +422,7 @@ expr :
         }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
         $$->trues = codigo.iniLista(codigo.obtenRef());
         $$->falses = codigo.iniLista(codigo.obtenRef()+1);
         codigo.anadirInstruccion("if " + $1->nom + " >= " + $3->nom + " goto");
@@ -429,6 +439,7 @@ expr :
         }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
         $$->trues = codigo.iniLista(codigo.obtenRef());
         $$->falses = codigo.iniLista(codigo.obtenRef()+1);
         codigo.anadirInstruccion("if " + $1->nom + " <= " + $3->nom + " goto");
@@ -444,6 +455,7 @@ expr :
         }
         $$ = new expresionstruct;
         $$->nom = codigo.iniNom();
+        $$->tipo = Codigo::BOOLEANO;
         $$->trues = codigo.iniLista(codigo.obtenRef());
         $$->falses = codigo.iniLista(codigo.obtenRef()+1);
         codigo.anadirInstruccion("if " + $1->nom + " /= " + $3->nom + " goto");
