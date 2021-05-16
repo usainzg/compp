@@ -18,7 +18,7 @@ program sumaPrimerosNueve
     };
 
     if (not acumulador > 10 and sumaParcial < 10) { [* BOOLEANOS *]
-        println(sumaParcial);
+        print(sumaParcial); [* Error Uso de print(), no existe proc *]
     };
 
     # acumulador contiene el resultado final de la suma de los primeros 9 números

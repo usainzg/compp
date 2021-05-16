@@ -216,11 +216,11 @@ sentencia : variable TASSIG expr TSEMIC
     }
     RELSE TLBRACE M lista_de_sentencias TRBRACE M TSEMIC
     {
-        codigo.completarInstrucciones($8->trues, $11->ref);
+        codigo.completarInstrucciones($8->trues, $12->ref);
         codigo.completarInstrucciones($8->falses, $3->ref);
         codigo.completarInstrucciones($4->skips, $7->ref);
-        codigo.completarInstrucciones($4->exits, $14->ref);
-        codigo.completarInstrucciones($12->exits, $14->ref);
+        codigo.completarInstrucciones($4->exits, $15->ref);
+        codigo.completarInstrucciones($13->exits, $15->ref);
         $$ = new sentenciastruct;
         $$->exits = codigo.iniLista(0);
         $$->skips = codigo.iniLista(0);
