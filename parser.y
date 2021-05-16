@@ -305,6 +305,7 @@ sentencia : variable TASSIG expr TSEMIC
 			codigo.completarInstrucciones($10->trues, $12->ref);
 			codigo.completarInstrucciones($10->falses, $20->ref + 2);
 			codigo.completarInstrucciones($19->exits, $20->ref + 2);
+            codigo.completarInstrucciones($19->skips, $9->ref);
 		} catch (string s){
 			yyerror(s.c_str());
 		}
@@ -511,7 +512,7 @@ expr :
     {
         $$ = new expresionstruct;
         try {
-            codigo.operacionAritmetica($$, *$1, *$3, *$2); // ultimo parametro tambien puede ser *$2
+            codigo.operacionAritmetica($$, *$1, *$3, "+"); // ultimo parametro tambien puede ser *$2
         } catch (string s) {
             yyerror(s.c_str());
             $$->nom = codigo.iniNom();

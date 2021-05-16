@@ -1,17 +1,4 @@
 program trianguloPascal 
-    [*
-        Este programa imprime el número de líneas que reciba por teclado del triángulo de pascal.
-        El siguiente es un ejemplo, si se le pasa el número 5 por teclado.
-
-        000001000000
-        000010100000
-        000102010000
-        001030301000
-        010406040100
-
-        => El objetivo es comprobar que los BOOLEANOS y los FOR funcionan.
-    *]
-    
     int rows, coef;
 {
     read(rows);
@@ -22,7 +9,7 @@ program trianguloPascal
             println(0);
         };
 
-        for(int j = 0; j <= i; j = j + 1){
+        for(int j = 0; j <= i; j = j + 1){ [* FOR *]
             if (j == 0 or i == 0) { [* BOOLEANOS *]
                 coef = 1;
             }; 

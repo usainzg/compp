@@ -573,9 +573,9 @@ static const yytype_int16 yyrline[] =
      113,   114,   117,   118,   121,   121,   125,   126,   130,   129,
      135,   136,   137,   141,   140,   143,   146,   153,   161,   186,
      200,   210,   209,   229,   242,   249,   257,   267,   289,   266,
-     315,   329,   338,   345,   348,   350,   365,   381,   398,   415,
-     432,   449,   465,   481,   497,   510,   524,   538,   552,   567,
-     576,   584,   592
+     316,   330,   339,   346,   349,   351,   366,   382,   399,   416,
+     433,   450,   466,   482,   498,   511,   525,   539,   553,   568,
+     577,   585,   593
 };
 #endif
 
@@ -1870,6 +1870,7 @@ yyreduce:
 			codigo.completarInstrucciones((yyvsp[-12].expr)->trues, (yyvsp[-10].m)->ref);
 			codigo.completarInstrucciones((yyvsp[-12].expr)->falses, (yyvsp[-2].m)->ref + 2);
 			codigo.completarInstrucciones((yyvsp[-3].lsent)->exits, (yyvsp[-2].m)->ref + 2);
+            codigo.completarInstrucciones((yyvsp[-3].lsent)->skips, (yyvsp[-13].m)->ref);
 		} catch (string s){
 			yyerror(s.c_str());
 		}
@@ -1877,11 +1878,11 @@ yyreduce:
 		(yyval.sent) = new sentenciastruct; (yyval.sent)->exits = codigo.iniLista(0); (yyval.sent)->skips = codigo.iniLista(0);
 		delete (yyvsp[-19].tp); delete (yyvsp[-16].expr); delete (yyvsp[-13].m); delete (yyvsp[-12].expr); delete (yyvsp[-10].m); delete (yyvsp[-8].var); delete (yyvsp[-6].expr); delete (yyvsp[-3].lsent); delete (yyvsp[-2].m);
     }
-#line 1881 "parser.cpp"
+#line 1882 "parser.cpp"
     break;
 
   case 40: /* sentencia: TIDENTIFIER TLPAREN lista_de_argumentos TRPAREN TSEMIC  */
-#line 316 "parser.y"
+#line 317 "parser.y"
     {
         try {
             codigo.llamadaProcedimiento(*(yyvsp[-4].str), (yyvsp[-2].arg)->lparam);
@@ -1893,45 +1894,45 @@ yyreduce:
         (yyval.sent)->skips = codigo.iniLista(0);
         delete (yyvsp[-2].arg);
     }
-#line 1897 "parser.cpp"
+#line 1898 "parser.cpp"
     break;
 
   case 41: /* lista_de_argumentos: expr resto_lista_argumentos  */
-#line 330 "parser.y"
+#line 331 "parser.y"
     {
         (yyval.arg) = new argumentostruct;
         (yyval.arg)->lparam = codigo.iniLista((yyvsp[-1].expr)->nom, (yyvsp[-1].expr)->tipo);
         (yyval.arg)->lparam = *codigo.unir((yyval.arg)->lparam, (yyvsp[0].arg)->lparam);
         delete (yyvsp[-1].expr); delete (yyvsp[0].arg);
     }
-#line 1908 "parser.cpp"
+#line 1909 "parser.cpp"
     break;
 
   case 42: /* resto_lista_argumentos: TCOMMA expr resto_lista_argumentos  */
-#line 339 "parser.y"
+#line 340 "parser.y"
     {
         (yyval.arg) = new argumentostruct;
         (yyval.arg)->lparam = codigo.iniLista((yyvsp[-1].expr)->nom, (yyvsp[-1].expr)->tipo);
         (yyval.arg)->lparam = *codigo.unir((yyval.arg)->lparam, (yyvsp[0].arg)->lparam);
         delete (yyvsp[-1].expr); delete (yyvsp[0].arg);
     }
-#line 1919 "parser.cpp"
+#line 1920 "parser.cpp"
     break;
 
   case 43: /* resto_lista_argumentos: %empty  */
-#line 345 "parser.y"
+#line 346 "parser.y"
              {(yyval.arg) = new argumentostruct; (yyval.arg)->lparam = codigo.iniLista("", "");}
-#line 1925 "parser.cpp"
+#line 1926 "parser.cpp"
     break;
 
   case 44: /* M: %empty  */
-#line 348 "parser.y"
+#line 349 "parser.y"
           { (yyval.m) = new mstruct; (yyval.m)->ref = codigo.obtenRef(); }
-#line 1931 "parser.cpp"
+#line 1932 "parser.cpp"
     break;
 
   case 45: /* variable: TIDENTIFIER  */
-#line 351 "parser.y"
+#line 352 "parser.y"
     { 
         string tipo;
         try {
@@ -1943,11 +1944,11 @@ yyreduce:
         (yyval.var)->nom = *(yyvsp[0].str);
         (yyval.var)->tipo = tipo;
     }
-#line 1947 "parser.cpp"
+#line 1948 "parser.cpp"
     break;
 
   case 46: /* expr: expr TEQUAL expr  */
-#line 366 "parser.y"
+#line 367 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-2].expr)->tipo, (yyvsp[0].expr)->tipo);
@@ -1963,11 +1964,11 @@ yyreduce:
         codigo.anadirInstruccion("goto");
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 1967 "parser.cpp"
+#line 1968 "parser.cpp"
     break;
 
   case 47: /* expr: expr TCGT expr  */
-#line 382 "parser.y"
+#line 383 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-2].expr)->tipo, Codigo::NUMERO);
@@ -1984,11 +1985,11 @@ yyreduce:
         codigo.anadirInstruccion("goto");
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 1988 "parser.cpp"
+#line 1989 "parser.cpp"
     break;
 
   case 48: /* expr: expr TCLT expr  */
-#line 399 "parser.y"
+#line 400 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-2].expr)->tipo, Codigo::NUMERO);
@@ -2005,11 +2006,11 @@ yyreduce:
         codigo.anadirInstruccion("goto");
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2009 "parser.cpp"
+#line 2010 "parser.cpp"
     break;
 
   case 49: /* expr: expr TCGE expr  */
-#line 416 "parser.y"
+#line 417 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-2].expr)->tipo, Codigo::NUMERO);
@@ -2026,11 +2027,11 @@ yyreduce:
         codigo.anadirInstruccion("goto");
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2030 "parser.cpp"
+#line 2031 "parser.cpp"
     break;
 
   case 50: /* expr: expr TCLE expr  */
-#line 433 "parser.y"
+#line 434 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-2].expr)->tipo, Codigo::NUMERO);
@@ -2047,11 +2048,11 @@ yyreduce:
         codigo.anadirInstruccion("goto");
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2051 "parser.cpp"
+#line 2052 "parser.cpp"
     break;
 
   case 51: /* expr: expr TNEQUAL expr  */
-#line 450 "parser.y"
+#line 451 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-2].expr)->tipo, (yyvsp[0].expr)->tipo);
@@ -2067,11 +2068,11 @@ yyreduce:
         codigo.anadirInstruccion("goto");
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2071 "parser.cpp"
+#line 2072 "parser.cpp"
     break;
 
   case 52: /* expr: expr RAND M expr  */
-#line 466 "parser.y"
+#line 467 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-3].expr)->tipo, Codigo::BOOLEANO);
@@ -2087,11 +2088,11 @@ yyreduce:
         (yyval.expr)->falses = *codigo.unir((yyvsp[-3].expr)->falses, (yyvsp[0].expr)->falses);
         delete (yyvsp[-3].expr); delete (yyvsp[-1].m);
     }
-#line 2091 "parser.cpp"
+#line 2092 "parser.cpp"
     break;
 
   case 53: /* expr: expr ROR M expr  */
-#line 482 "parser.y"
+#line 483 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[-3].expr)->tipo, Codigo::BOOLEANO);
@@ -2107,11 +2108,11 @@ yyreduce:
         (yyval.expr)->falses = (yyvsp[0].expr)->falses;
         delete (yyvsp[-3].expr); delete (yyvsp[-1].m);
     }
-#line 2111 "parser.cpp"
+#line 2112 "parser.cpp"
     break;
 
   case 54: /* expr: RNOT expr  */
-#line 498 "parser.y"
+#line 499 "parser.y"
     {
         try {
             codigo.comprobarTipos((yyvsp[0].expr)->tipo, Codigo::BOOLEANO);
@@ -2124,15 +2125,15 @@ yyreduce:
         (yyval.expr)->trues = (yyvsp[0].expr)->falses;
         (yyval.expr)->falses = (yyvsp[0].expr)->trues;
     }
-#line 2128 "parser.cpp"
+#line 2129 "parser.cpp"
     break;
 
   case 55: /* expr: expr TPLUS expr  */
-#line 511 "parser.y"
+#line 512 "parser.y"
     {
         (yyval.expr) = new expresionstruct;
         try {
-            codigo.operacionAritmetica((yyval.expr), *(yyvsp[-2].expr), *(yyvsp[0].expr), *(yyvsp[-1].str)); // ultimo parametro tambien puede ser *$2
+            codigo.operacionAritmetica((yyval.expr), *(yyvsp[-2].expr), *(yyvsp[0].expr), "+"); // ultimo parametro tambien puede ser *$2
         } catch (string s) {
             yyerror(s.c_str());
             (yyval.expr)->nom = codigo.iniNom();
@@ -2142,11 +2143,11 @@ yyreduce:
         }
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2146 "parser.cpp"
+#line 2147 "parser.cpp"
     break;
 
   case 56: /* expr: expr TMINUS expr  */
-#line 525 "parser.y"
+#line 526 "parser.y"
     {
         (yyval.expr) = new expresionstruct;
         try {
@@ -2160,11 +2161,11 @@ yyreduce:
         }
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2164 "parser.cpp"
+#line 2165 "parser.cpp"
     break;
 
   case 57: /* expr: expr TMUL expr  */
-#line 539 "parser.y"
+#line 540 "parser.y"
     {
         (yyval.expr) = new expresionstruct;
         try {
@@ -2178,11 +2179,11 @@ yyreduce:
         }
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2182 "parser.cpp"
+#line 2183 "parser.cpp"
     break;
 
   case 58: /* expr: expr TDIV expr  */
-#line 553 "parser.y"
+#line 554 "parser.y"
     {
         (yyval.expr) = new expresionstruct;
         codigo.anadirInstruccion("if " + (yyvsp[0].expr)->nom + " = 0 goto ErrorDiv0;");
@@ -2197,11 +2198,11 @@ yyreduce:
         }
         delete (yyvsp[-2].expr); delete (yyvsp[0].expr);
     }
-#line 2201 "parser.cpp"
+#line 2202 "parser.cpp"
     break;
 
   case 59: /* expr: variable  */
-#line 568 "parser.y"
+#line 569 "parser.y"
     {
         (yyval.expr) = new expresionstruct;
         (yyval.expr)->nom = (yyvsp[0].var)->nom;
@@ -2210,11 +2211,11 @@ yyreduce:
         (yyval.expr)->falses = codigo.iniLista(0);
         delete (yyvsp[0].var);
     }
-#line 2214 "parser.cpp"
+#line 2215 "parser.cpp"
     break;
 
   case 60: /* expr: TINTEGER  */
-#line 577 "parser.y"
+#line 578 "parser.y"
     {
         (yyval.expr) = new expresionstruct;
         (yyval.expr)->nom = *(yyvsp[0].str);
@@ -2222,11 +2223,11 @@ yyreduce:
         (yyval.expr)->trues = codigo.iniLista(0);
         (yyval.expr)->falses = codigo.iniLista(0);
     }
-#line 2226 "parser.cpp"
+#line 2227 "parser.cpp"
     break;
 
   case 61: /* expr: TDOUBLE  */
-#line 585 "parser.y"
+#line 586 "parser.y"
     {
         (yyval.expr) = new expresionstruct;
         (yyval.expr)->nom = *(yyvsp[0].str);
@@ -2234,19 +2235,19 @@ yyreduce:
         (yyval.expr)->trues = codigo.iniLista(0);
         (yyval.expr)->falses = codigo.iniLista(0);
     }
-#line 2238 "parser.cpp"
+#line 2239 "parser.cpp"
     break;
 
   case 62: /* expr: TLPAREN expr TRPAREN  */
-#line 593 "parser.y"
+#line 594 "parser.y"
     {
         (yyval.expr) = (yyvsp[-1].expr);
     }
-#line 2246 "parser.cpp"
+#line 2247 "parser.cpp"
     break;
 
 
-#line 2250 "parser.cpp"
+#line 2251 "parser.cpp"
 
       default: break;
     }
