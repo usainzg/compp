@@ -1,12 +1,5 @@
 program sumaPrimerosDiez
-    [*
-        Este programa calcula la suma de los primeros 10 números enteros.
-        El exit solo se activa cuando se cumplen las dos condiciones booleanas del if,
-        en cualquier caso, la primera suma (acumulador = acumulador + i) se calcula siempre.
-    *]
-    
     int acumulador, entrada;
-
 {
     acumulador = 0;
     read(entrada);
