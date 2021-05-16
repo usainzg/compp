@@ -28,3 +28,4 @@ prueba:
 	./parser <Pruebas/PruebaMala5.in
 	./parser <Pruebas/PruebaMala6.in
 	./parser <Pruebas/PruebaMala7.in
+	./parser <Pruebas/PruebaMala8.in

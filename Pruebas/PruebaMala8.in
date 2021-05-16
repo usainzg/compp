@@ -1,0 +1,12 @@
+program condicionesNumericas {
+
+    [* No se puede colocar una expresión aritmética como condición. *]
+
+    for (float i = 1; 8 + 7; i = i + 1.0) {
+        println(i);
+        if (i + 3) then {
+            println(0);
+        };
+        skip if 65 * 98;
+    };
+}
