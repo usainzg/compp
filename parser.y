@@ -48,7 +48,7 @@ qué atributos tienen los tokens
 %token <str> RFLOAT RINTEGER
 %token <str> RFOR RWHILE RUNTIL RIF RELSE RFOREVER RDO RSKIP REXIT
 %token <str> RAND ROR RNOT
-%token <str> RREAD RPRINTLN RPRINT
+%token <str> RREAD RPRINTLN
 
 
 %right RAND ROR
